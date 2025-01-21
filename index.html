@@ -1,120 +1,118 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <title>Foreverbox Chatroom</title>
+        <style>
+            body {
+                background-color: #68cfff;
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+            }
 
-<head>
-    <title>Foreverbox Chatroom</title>
-    <style>
-        body {
-    background-color: #68cfff;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-}
+            .container {
+                max-width: 400px;
+                margin: 50px auto;
+                padding: 20px;
+                background-color: white;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
 
-.container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+            .logo {
+                text-align: center;
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 20px;
+                color: #0a5274;
+            }
 
-.logo {
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #0a5274;
-}
+            .form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+            .input {
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 10px;
+                margin-bottom: 10px;
+                width: 100%;
+            }
 
-.input {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-    width: 100%;
-}
+            .button {
+                background-color: #0a5274;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 10px;
+                width: 100%;
+                cursor: pointer;
+            }
 
-.button {
-    background-color: #0a5274;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    width: 100%;
-    cursor: pointer;
-}
+            .messageArea {
+                margin-top: 20px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 10px;
+                height: 200px;
+                overflow-y: scroll;
+            }
 
-.messageArea {
-    margin-top: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    height: 200px;
-    overflow-y: scroll;
-}
+            .message {
+                margin-bottom: 5px;
+            }
 
-.message {
-    margin-bottom: 5px;
-}
+            .username {
+                font-weight: bold;
+                color: #0a5274;
+            }
+        </style>
+    </head>
 
-.username {
-    font-weight: bold;
-    color: #0a5274;
-}
-    </style>
-</head>
+    <body>
+        <div class="container">
+            <h1 class="logo">Foreverbox Chatroom</h1>
+            <form class="form" id="form">
+                <input class="input" type="text" placeholder="Name" id="myname" />
+                <input class="input" type="text" placeholder="Message" id="message" />
+                <button class="button" type="submit">Send Message</button>
+            </form>
+            <div class="messageArea" id="messageArea"></div>
+        </div>
+    </body>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket = io();
 
-<body>
-    <div class="container">
-        <h1 class="logo">Foreverbox Chatroom</h1>
-        <form class="form" id="form">
-            <input class="input" type="text" placeholder="Name" id="myname">
-            <input class="input" type="text" placeholder="Message" id="message">
-            <button class="button" type="submit">Send Message</button>
-        </form>
-        <div class="messageArea" id="messageArea"></div>
-    </div>
-</body>
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    let socket = io();
+        let form = document.getElementById("form");
+        let myname = document.getElementById("myname");
+        let message = document.getElementById("message");
+        let messageArea = document.getElementById("messageArea");
 
-    let form = document.getElementById('form');
-    let myname = document.getElementById('myname');
-    let message = document.getElementById('message');
-    let messageArea = document.getElementById("messageArea");
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
 
-    form.addEventListener("submit", (e) => {
-        e.preventDefault();
+            if (message.value) {
+                socket.emit("send name", myname.value);
+                socket.emit("send message", message.value);
+                message.value = "";
+            }
+        });
 
-        if (message.value) {
-            socket.emit('send name', myname.value);
-            socket.emit('send message', message.value);
-            message.value = "";
-        }
-    });
-
-    socket.on('send name', (username) => {
-            let name = document.createElement('p');
-            name.classList.add('message');
+        socket.on("send name", (username) => {
+            let name = document.createElement("p");
+            name.classList.add("message");
             name.innerHTML = `<span class="username">${username}:</span>`;
             messageArea.appendChild(name);
         });
 
-        socket.on('send message', (chat) => {
-            let chatContent = document.createElement('p');
-            chatContent.classList.add('message');
+        socket.on("send message", (chat) => {
+            let chatContent = document.createElement("p");
+            chatContent.classList.add("message");
             chatContent.textContent = chat;
             messageArea.appendChild(chatContent);
         });
-</script>
-
+    </script>
 </html>
