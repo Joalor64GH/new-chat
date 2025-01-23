@@ -61,12 +61,18 @@
             }
 
             .message {
-                margin-bottom: 5px;
+                margin-bottom: 2px;
             }
 
             .username {
                 font-weight: bold;
                 color: #0a5274;
+            }
+
+            .timestamp {
+                font-size: 0.8em;
+                color: gray;
+                margin-left: 6px;
             }
         </style>
     </head>
@@ -103,8 +109,9 @@
 
         socket.on("send name", (username) => {
             let name = document.createElement("p");
+            const time = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             name.classList.add("message");
-            name.innerHTML = `<span class="username">${username}:</span>`;
+            name.innerHTML = `<span class="username">${username}</span><span class="timestamp">(${time})</span>`;
             messageArea.appendChild(name);
         });
 

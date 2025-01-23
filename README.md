@@ -1,2 +1,2 @@
 # new-chat
-Chatroom deployed using Vercel.
+Chatroom deployed using Render.
