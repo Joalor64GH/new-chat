@@ -61,7 +61,7 @@
             }
 
             .message {
-                margin-bottom: 2px;
+                margin-bottom: 0.5px;
             }
 
             .username {
@@ -109,7 +109,7 @@
 
         socket.on("send name", (username) => {
             let name = document.createElement("p");
-            const time = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             name.classList.add("message");
             name.innerHTML = `<span class="username">${username}</span><span class="timestamp">(${time})</span>`;
             messageArea.appendChild(name);
