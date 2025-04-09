@@ -6,7 +6,84 @@
     <title>Joalor64's Chatroom</title>
     <meta name='author' content='Joalor64'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #68cfff;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', sans-serif;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #0a5274;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .button {
+            background-color: #0a5274;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .messageArea {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            height: 200px;
+            overflow-y: scroll;
+        }
+
+        .message {
+            margin-bottom: 0.5px;
+        }
+
+        .username {
+            font-weight: bold;
+            color: #0a5274;
+        }
+
+        .timestamp {
+            font-size: 0.8em;
+            color: gray;
+            margin-left: 6px;
+        }
+
+        .shake {
+            display: inline-block;
+            transition: transform 0.1s;
+        }
+    </style>
     <link rel="icon" href="favicon.png" type="image/x-icon" />
 </head>
 
@@ -22,6 +99,100 @@
     </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
-<script src="chat.js"></script>
+<script>
+    let socket = io();
+
+    let form = document.getElementById("form");
+    let myname = document.getElementById("myname");
+    let message = document.getElementById("message");
+    let messageArea = document.getElementById("messageArea");
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        if (message.value) {
+            socket.emit("send name", myname.value);
+            socket.emit("send message", message.value);
+            message.value = "";
+        }
+    });
+
+    socket.on("send name", (username) => {
+        let name = document.createElement("p");
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        name.classList.add("message");
+        name.innerHTML = `<span class="username">${username}</span><span class="timestamp">(${time})</span>`;
+        messageArea.appendChild(name);
+    });
+
+    socket.on("send message", (chat) => {
+        let chatContent = document.createElement("p");
+        chatContent.classList.add("message");
+        chatContent.textContent = chat;
+        chatContent.innerHTML = parseMessage(chat.message);
+        messageArea.appendChild(chatContent);
+
+        if (chat.message.includes('{!shake}')) {
+            shakeEffect(chatContent);
+        }
+    });
+
+    function parseMessage(message) {
+        const colorRegex = /\{\!color:(#[0-9A-Fa-f]{6})\}\s*(.+)/g;
+        message = message.replace(colorRegex, (match, color, text) => {
+            return `<span style="color: ${color};">${text}</span>`;
+        });
+
+        const shakeRegex = /\{\!shake\}\s*(.+)/g;
+        message = message.replace(shakeRegex, (match, text) => {
+            return `<span class="shake">${text}</span>`;
+        });
+
+        const smallTextRegex = /\^(.+?)\^/g;
+        message = message.replace(smallTextRegex, (match, text) => {
+            return `<span class="small-text">${text}</span>`;
+        });
+
+        return message
+            .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+            .replace(/_(.*?)_/g, "<i>$1</i>")
+            .replace(/~~(.*?)~~/g, "<s>$1</s>");
+    }
+
+    function shakeEffect(element) {
+        const letters = element.innerText.split('').map((letter) => {
+            const span = document.createElement('span');
+            span.innerText = letter;
+            span.classList.add('shake');
+            return span;
+        });
+
+        element.innerHTML = '';
+        letters.forEach(span => element.appendChild(span));
+
+        const shakeDistance = 1.5;
+        const shakeInterval = 1;
+
+        setInterval(() => {
+            letters.forEach(letter => {
+                const shakeX = (Math.random() * shakeDistance * 1) - shakeDistance;
+                const shakeY = (Math.random() * shakeDistance * 1) - shakeDistance;
+                letter.style.transform = `translate(${shakeX}px, ${shakeY}px)`;
+            });
+        }, shakeInterval);
+    }
+
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .shake {
+            display: inline-block;
+            transition: transform 0.05s;
+        }
+        .small-text {
+            font-size: 0.75em;
+            opacity: 0.6;
+        }
+    `;
+    document.head.appendChild(style);</script>
 
 </html>
