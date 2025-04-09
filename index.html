@@ -128,7 +128,6 @@
     socket.on("send message", (chat) => {
         let chatContent = document.createElement("p");
         chatContent.classList.add("message");
-        chatContent.textContent = chat;
         chatContent.innerHTML = parseMessage(chat.message);
         messageArea.appendChild(chatContent);
 
@@ -193,6 +192,7 @@
             opacity: 0.6;
         }
     `;
-    document.head.appendChild(style);</script>
+    document.head.appendChild(style);
+</script>
 
 </html>
