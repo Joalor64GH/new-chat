@@ -6,6 +6,7 @@
     <title>Joalor64's Chatroom</title>
     <meta name='author' content='Joalor64'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="favicon.png" type="image/x-icon" />
     <style>
         body {
             background-color: #68cfff;
@@ -78,18 +79,12 @@
             color: gray;
             margin-left: 6px;
         }
-
-        .shake {
-            display: inline-block;
-            transition: transform 0.1s;
-        }
     </style>
-    <link rel="icon" href="favicon.png" type="image/x-icon" />
 </head>
 
 <body>
     <div class="container">
-        <h1 class="logo">Joalor64's Chatroom</h1>
+        <h1 class="logo">Joalor64's Chatroom (test)</h1>
         <form class="form" id="form">
             <input class="input" type="text" placeholder="Name" id="myname" />
             <input class="input" type="text" placeholder="Message" id="message" />
@@ -128,71 +123,9 @@
     socket.on("send message", (chat) => {
         let chatContent = document.createElement("p");
         chatContent.classList.add("message");
-        chatContent.innerHTML = parseMessage(chat.message);
+        chatContent.textContent = chat;
         messageArea.appendChild(chatContent);
-
-        if (chat.message.includes('{!shake}')) {
-            shakeEffect(chatContent);
-        }
     });
-
-    function parseMessage(message) {
-        const colorRegex = /\{\!color:(#[0-9A-Fa-f]{6})\}\s*(.+)/g;
-        message = message.replace(colorRegex, (match, color, text) => {
-            return `<span style="color: ${color};">${text}</span>`;
-        });
-
-        const shakeRegex = /\{\!shake\}\s*(.+)/g;
-        message = message.replace(shakeRegex, (match, text) => {
-            return `<span class="shake">${text}</span>`;
-        });
-
-        const smallTextRegex = /\^(.+?)\^/g;
-        message = message.replace(smallTextRegex, (match, text) => {
-            return `<span class="small-text">${text}</span>`;
-        });
-
-        return message
-            .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
-            .replace(/_(.*?)_/g, "<i>$1</i>")
-            .replace(/~~(.*?)~~/g, "<s>$1</s>");
-    }
-
-    function shakeEffect(element) {
-        const letters = element.innerText.split('').map((letter) => {
-            const span = document.createElement('span');
-            span.innerText = letter;
-            span.classList.add('shake');
-            return span;
-        });
-
-        element.innerHTML = '';
-        letters.forEach(span => element.appendChild(span));
-
-        const shakeDistance = 1.5;
-        const shakeInterval = 1;
-
-        setInterval(() => {
-            letters.forEach(letter => {
-                const shakeX = (Math.random() * shakeDistance * 1) - shakeDistance;
-                const shakeY = (Math.random() * shakeDistance * 1) - shakeDistance;
-                letter.style.transform = `translate(${shakeX}px, ${shakeY}px)`;
-            });
-        }, shakeInterval);
-    }
-
-    const style = document.createElement('style');
-    style.innerHTML = `
-        .shake {
-            display: inline-block;
-            transition: transform 0.05s;
-        }
-        .small-text {
-            font-size: 0.75em;
-            opacity: 0.6;
-        }
-    `;
-    document.head.appendChild(style);
 </script>
 
 </html>
