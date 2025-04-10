@@ -71,33 +71,6 @@
             margin-bottom: 0.5px;
         }
 
-        .onlineUsers {
-            width: 150px;
-            margin-left: 10px;
-            padding: 10px;
-            background-color: #f1f1f1;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .onlineUsers h3 {
-            margin: 0 0 10px;
-            font-size: 16px;
-            color: #0a5274;
-        }
-
-        .onlineUsers ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .onlineUsers li {
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: #333;
-        }
-
         .username {
             font-weight: bold;
             color: var(--username-color, #0a5274);
@@ -194,13 +167,7 @@
             <input class="input" type="text" placeholder="Message" id="message" />
             <button class="button" type="submit">Send Message</button>
         </form>
-        <div style="display: flex;">
-            <div class="messageArea" id="messageArea"></div>
-            <div class="onlineUsers" id="onlineUsers">
-                <h3>Online Users</h3>
-                <ul id="usersList"></ul>
-            </div>
-        </div>
+        <div class="messageArea" id="messageArea"></div>
     </div>
     <div id="settings-popup" class="popup hidden">
         <div class="popup-header">
@@ -396,17 +363,6 @@
 
         socket.on("send message", (message) => {
             io.emit("send message", message);
-        });
-    });
-
-    socket.on("update users", (users) => {
-        const usersList = document.getElementById("usersList");
-        usersList.innerHTML = "";
-
-        users.forEach((user) => {
-            const userItem = document.createElement("li");
-            userItem.textContent = user;
-            usersList.appendChild(userItem);
         });
     });
 </script>
