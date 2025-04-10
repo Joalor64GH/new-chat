@@ -357,6 +357,16 @@
 
         settingsPopup.classList.add("hidden");
     });
+
+    io.on("connection", (socket) => {
+        socket.on("send name", (data) => {
+            io.emit("send name", data);
+        });
+
+        socket.on("send message", (message) => {
+            io.emit("send message", message);
+        });
+    });
 </script>
 
 </html>
