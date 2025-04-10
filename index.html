@@ -73,7 +73,15 @@
 
         .username {
             font-weight: bold;
-            color: #0a5274;
+            color: var(--username-color, #0a5274);
+        }
+
+        .profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
         }
 
         .timestamp {
@@ -93,6 +101,16 @@
             right: 10px;
             font-size: 24px;
             cursor: pointer;
+        }
+
+        .popup-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
         }
 
         .popup {
@@ -161,6 +179,7 @@
         </form>
         <div class="messageArea" id="messageArea"></div>
     </div>
+    <div id="popup-bg" class="popup-bg hidden"></div>
     <div id="settings-popup" class="popup hidden">
         <div class="popup-header">
             <span>Settings</span>
@@ -197,11 +216,23 @@
     });
 
     socket.on("send name", (username) => {
-        let name = document.createElement("p");
+        let nameContainer = document.createElement("p");
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        name.classList.add("message");
-        name.innerHTML = `<span class="username">${username}</span><span class="timestamp">(${time})</span>`;
-        messageArea.appendChild(name);
+        nameContainer.classList.add("message");
+
+        const savedProfilePicture = localStorage.getItem("profilePicture");
+        let profileImg = "";
+        if (savedProfilePicture) {
+            profileImg = `<img class="profile" src="${savedProfilePicture}" alt="Profile Picture">`;
+        }
+
+        nameContainer.innerHTML = `
+            ${profileImg}
+            <span class="username">${username}</span>
+            <span class="timestamp">(${time})</span>
+        `;
+
+        messageArea.appendChild(nameContainer);
     });
 
     socket.on("send message", (chat) => {
@@ -279,25 +310,52 @@
     const saveSettings = document.getElementById("save-settings");
     const usernameColor = document.getElementById("username-color");
     const profilePicture = document.getElementById("profile-picture");
+    const popupBg = document.getElementById("popup-bg");
+
+    window.addEventListener("load", () => {
+        const savedColor = localStorage.getItem("usernameColor");
+        const savedProfilePicture = localStorage.getItem("profilePicture");
+
+        if (savedColor) {
+            usernameColor.value = savedColor;
+            document.documentElement.style.setProperty("--username-color", savedColor);
+        }
+
+        if (savedProfilePicture) {
+            console.log("Profile Picture Loaded:", savedProfilePicture);
+        }
+    });
 
     settingsIcon.addEventListener("click", () => {
         settingsPopup.classList.remove("hidden");
+        popupBg.classList.remove("hidden");
     });
 
     closePopup.addEventListener("click", () => {
         settingsPopup.classList.add("hidden");
+        popupBg.classList.add("hidden");
     });
 
     saveSettings.addEventListener("click", () => {
         const selectedColor = usernameColor.value;
         const selectedFile = profilePicture.files[0];
 
-        console.log("Username Color:", selectedColor);
+        localStorage.setItem("usernameColor", selectedColor);
+        document.documentElement.style.setProperty("--username-color", selectedColor);
+
         if (selectedFile) {
-            console.log("Profile Picture File:", selectedFile.name);
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                localStorage.setItem("profilePicture", event.target.result);
+                console.log("Profile Picture Saved:", event.target.result);
+            };
+            reader.readAsDataURL(selectedFile);
         }
 
+        console.log("Username Color Saved:", selectedColor);
+
         settingsPopup.classList.add("hidden");
+        popupBg.classList.add("hidden");
     });
 </script>
 
