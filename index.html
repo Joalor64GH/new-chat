@@ -34,31 +34,6 @@
             color: #0a5274;
         }
 
-        .online-users {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-
-        .online-users h3 {
-            margin: 0 0 10px 0;
-            font-size: 18px;
-            color: #0a5274;
-        }
-
-        .online-users ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .online-users li {
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-
         .form {
             display: flex;
             flex-direction: column;
@@ -187,10 +162,6 @@
     <div class="container">
         <i id="settings-icon" class="fa fa-gear"></i>
         <h1 class="logo">Joalor64's Chatroom</h1>
-        <div id="online-users" class="online-users">
-            <h3>Online Users</h3>
-            <ul id="users-list"></ul>
-        </div>
         <form class="form" id="form">
             <input class="input" type="text" placeholder="Name" id="myname" />
             <input class="input" type="text" placeholder="Message" id="message" />
@@ -400,23 +371,6 @@
         socket.on("send message", (message) => {
             io.emit("send message", message);
         });
-    });
-
-    let usersList = document.getElementById("users-list");
-
-    socket.on("update users", (users) => {
-        usersList.innerHTML = "";
-        users.forEach((user) => {
-            let userItem = document.createElement("li");
-            userItem.textContent = user;
-            usersList.appendChild(userItem);
-        });
-    });
-
-    socket.emit("user connected", localStorage.getItem("username") || "Anonymous");
-
-    window.addEventListener("beforeunload", () => {
-        socket.emit("user disconnected", localStorage.getItem("username") || "Anonymous");
     });
 </script>
 
