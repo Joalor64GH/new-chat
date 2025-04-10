@@ -6,7 +6,7 @@
     <title>Joalor64's Chatroom</title>
     <meta name='author' content='Joalor64'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.2/dist/index.min.js"></script>
+    <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="icon" href="favicon.png" type="image/x-icon" />
     <style>
@@ -165,10 +165,7 @@
         <h1 class="logo">Joalor64's Chatroom</h1>
         <form class="form" id="form">
             <input class="input" type="text" placeholder="Name" id="myname" />
-            <div style="display: flex; align-items: center;">
-                <input class="input" type="text" placeholder="Message" id="message" />
-                <button id="emoji-button" type="button" style="margin-left: 5px;">😊</button>
-            </div>
+            <input class="input" type="text" placeholder="Message" id="message" />
             <button class="button" type="submit">Send Message</button>
         </form>
         <div class="messageArea" id="messageArea"></div>
@@ -268,10 +265,12 @@
             return `<span class="small-text">${text}</span>`;
         });
 
-        return message
+        message = message
             .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
             .replace(/_(.*?)_/g, "<i>$1</i>")
             .replace(/~~(.*?)~~/g, "<s>$1</s>");
+
+        return twemoji.parse(message);
     }
 
     function shakeEffect(element) {
@@ -358,18 +357,6 @@
         console.log("Username Color Saved:", selectedColor);
 
         settingsPopup.classList.add("hidden");
-    });
-
-    const emojiButton = document.getElementById('emoji-button');
-    const messageInput = document.getElementById('message');
-    const picker = new EmojiButton();
-
-    emojiButton.addEventListener('click', () => {
-        picker.togglePicker(emojiButton);
-    });
-
-    picker.on('emoji', emoji => {
-        messageInput.value += emoji;
     });
 </script>
 
