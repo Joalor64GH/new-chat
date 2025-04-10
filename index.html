@@ -186,7 +186,6 @@
     </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/emoji-js@3.6.0/lib/emoji.min.js"></script>
 <script>
     let socket = io();
 
@@ -265,12 +264,12 @@
             return `<span class="small-text">${text}</span>`;
         });
 
-        message = emoji.replace_colons(message);
-
-        return message
+        message = message
             .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
             .replace(/_(.*?)_/g, "<i>$1</i>")
             .replace(/~~(.*?)~~/g, "<s>$1</s>");
+
+        return twemoji.parse(message);
     }
 
     function shakeEffect(element) {
