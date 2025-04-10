@@ -103,16 +103,6 @@
             cursor: pointer;
         }
 
-        .popup-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-
         .popup {
             position: fixed;
             top: 50%;
@@ -179,7 +169,6 @@
         </form>
         <div class="messageArea" id="messageArea"></div>
     </div>
-    <div id="popup-bg" class="popup-bg hidden"></div>
     <div id="settings-popup" class="popup hidden">
         <div class="popup-header">
             <span>Settings</span>
@@ -310,7 +299,6 @@
     const saveSettings = document.getElementById("save-settings");
     const usernameColor = document.getElementById("username-color");
     const profilePicture = document.getElementById("profile-picture");
-    const popupBg = document.getElementById("popup-bg");
 
     window.addEventListener("load", () => {
         const savedColor = localStorage.getItem("usernameColor");
@@ -328,12 +316,10 @@
 
     settingsIcon.addEventListener("click", () => {
         settingsPopup.classList.remove("hidden");
-        popupBg.classList.remove("hidden");
     });
 
     closePopup.addEventListener("click", () => {
         settingsPopup.classList.add("hidden");
-        popupBg.classList.add("hidden");
     });
 
     saveSettings.addEventListener("click", () => {
@@ -355,7 +341,6 @@
         console.log("Username Color Saved:", selectedColor);
 
         settingsPopup.classList.add("hidden");
-        popupBg.classList.add("hidden");
     });
 </script>
 
