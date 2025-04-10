@@ -12,7 +12,21 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
+let onlineUsers = [];
+
 io.on('connection', (socket) => {
+    socket.on("user connected", (username) => {
+        if (!onlineUsers.includes(username)) {
+            onlineUsers.push(username);
+        }
+        io.emit("update users", onlineUsers);
+    });
+
+    socket.on("user disconnected", (username) => {
+        onlineUsers = onlineUsers.filter((user) => user !== username);
+        io.emit("update users", onlineUsers);
+    });
+    
     socket.on('send name', (username) => {
         io.emit('send name', (username));
     });
