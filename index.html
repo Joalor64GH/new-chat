@@ -198,9 +198,9 @@
         e.preventDefault();
 
         if (myname.value) {
-            localStorage.setItem("username", myname.value); // Save username
-            const myColor = localStorage.getItem("usernameColor") || "#0a5274"; // Default color
-            const myProfilePicture = localStorage.getItem("profilePicture") || ""; // Default empty
+            localStorage.setItem("username", myname.value);
+            const myColor = localStorage.getItem("usernameColor") || "#0a5274";
+            const myProfilePicture = localStorage.getItem("profilePicture") || "";
             socket.emit("send name", {
                 username: myname.value,
                 color: myColor,
@@ -221,13 +221,11 @@
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         nameContainer.classList.add("message");
 
-        // Use the profile picture sent by the server
         let profileImg = "";
         if (profilePicture) {
             profileImg = `<img class="profile" src="${profilePicture}" alt="Profile Picture">`;
         }
 
-        // Apply the color for the username
         nameContainer.innerHTML = `
             ${profileImg}
             <span class="username" style="color: ${username === myname.value ? localStorage.getItem("usernameColor") : color};">
@@ -358,14 +356,38 @@
         settingsPopup.classList.add("hidden");
     });
 
+    const io = require("socket.io")(server);
+
+    let onlineUserCount = 0;
+
     io.on("connection", (socket) => {
+        onlineUserCount++;
+        io.emit("update user count", onlineUserCount);
+
+        socket.on("disconnect", () => {
+            onlineUserCount--;
+            io.emit("update user count", onlineUserCount);
+        });
+
         socket.on("send name", (data) => {
-            io.emit("send name", data); // Broadcast username, color, and profile picture to all clients
+            io.emit("send name", data);
         });
 
         socket.on("send message", (message) => {
-            io.emit("send message", message); // Broadcast messages
+            io.emit("send message", message);
         });
+    });
+
+    let onlineUsers = document.createElement("div");
+    onlineUsers.id = "online-users";
+    onlineUsers.style.textAlign = "center";
+    onlineUsers.style.marginTop = "10px";
+    onlineUsers.style.fontWeight = "bold";
+    onlineUsers.style.color = "#0a5274";
+    document.body.insertBefore(onlineUsers, document.body.firstChild);
+
+    socket.on("update user count", (count) => {
+        onlineUsers.textContent = `Online Users: ${count}`;
     });
 </script>
 
