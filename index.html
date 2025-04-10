@@ -6,6 +6,7 @@
     <title>Joalor64's Chatroom</title>
     <meta name='author' content='Joalor64'>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="icon" href="favicon.png" type="image/x-icon" />
     <style>
         body {
@@ -84,11 +85,20 @@
             display: inline-block;
             transition: transform 0.1s;
         }
+
+        #settings-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 50px;
+            height: 50px;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
+        <i id="settings-icon" class="fa fa-gear"></i>
         <h1 class="logo">Joalor64's Chatroom</h1>
         <form class="form" id="form">
             <input class="input" type="text" placeholder="Name" id="myname" />
