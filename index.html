@@ -186,6 +186,7 @@
     </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/emoji-js@3.6.0/lib/emoji.min.js"></script>
 <script>
     let socket = io();
 
@@ -193,6 +194,10 @@
     let myname = document.getElementById("myname");
     let message = document.getElementById("message");
     let messageArea = document.getElementById("messageArea");
+
+    const emoji = new EmojiConvertor();
+    emoji.replace_mode = 'unified';
+    emoji.allow_native = true;
 
     form.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -263,6 +268,8 @@
         message = message.replace(smallTextRegex, (match, text) => {
             return `<span class="small-text">${text}</span>`;
         });
+
+        message = emoji.replace_colons(message);
 
         return message
             .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
