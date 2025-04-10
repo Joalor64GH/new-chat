@@ -94,6 +94,59 @@
             font-size: 24px;
             cursor: pointer;
         }
+
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .popup.hidden {
+            display: none;
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .popup-content label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .popup-content input {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        #save-settings {
+            background-color: #0a5274;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -107,6 +160,21 @@
             <button class="button" type="submit">Send Message</button>
         </form>
         <div class="messageArea" id="messageArea"></div>
+    </div>
+    <div id="settings-popup" class="popup hidden">
+        <div class="popup-header">
+            <span>Settings</span>
+            <button id="close-popup" class="close-button">&times;</button>
+        </div>
+        <div class="popup-content">
+            <label for="username-color">Username Color:</label>
+            <input type="color" id="username-color" />
+
+            <label for="profile-picture">Profile Picture:</label>
+            <input type="file" id="profile-picture" accept="image/*" />
+
+            <button id="save-settings" class="button">Save</button>
+        </div>
     </div>
 </body>
 <script src="/socket.io/socket.io.js"></script>
@@ -204,6 +272,33 @@
         }
     `;
     document.head.appendChild(style);
+
+    const settingsIcon = document.getElementById("settings-icon");
+    const settingsPopup = document.getElementById("settings-popup");
+    const closePopup = document.getElementById("close-popup");
+    const saveSettings = document.getElementById("save-settings");
+    const usernameColor = document.getElementById("username-color");
+    const profilePicture = document.getElementById("profile-picture");
+
+    settingsIcon.addEventListener("click", () => {
+        settingsPopup.classList.remove("hidden");
+    });
+
+    closePopup.addEventListener("click", () => {
+        settingsPopup.classList.add("hidden");
+    });
+
+    saveSettings.addEventListener("click", () => {
+        const selectedColor = usernameColor.value;
+        const selectedFile = profilePicture.files[0];
+
+        console.log("Username Color:", selectedColor);
+        if (selectedFile) {
+            console.log("Profile Picture File:", selectedFile.name);
+        }
+
+        settingsPopup.classList.add("hidden");
+    });
 </script>
 
 </html>
