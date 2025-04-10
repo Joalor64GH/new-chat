@@ -197,27 +197,42 @@
     form.addEventListener("submit", (e) => {
         e.preventDefault();
 
+        if (myname.value) {
+            localStorage.setItem("username", myname.value); // Save username
+            const myColor = localStorage.getItem("usernameColor") || "#0a5274"; // Default color
+            const myProfilePicture = localStorage.getItem("profilePicture") || ""; // Default empty
+            socket.emit("send name", {
+                username: myname.value,
+                color: myColor,
+                profilePicture: myProfilePicture,
+            });
+        }
+
         if (message.value) {
-            socket.emit("send name", myname.value);
             socket.emit("send message", message.value);
             message.value = "";
         }
     });
 
-    socket.on("send name", (username) => {
+    socket.on("send name", (data) => {
+        const { username, color, profilePicture } = data;
+
         let nameContainer = document.createElement("p");
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         nameContainer.classList.add("message");
 
-        const savedProfilePicture = localStorage.getItem("profilePicture");
+        // Use the profile picture sent by the server
         let profileImg = "";
-        if (savedProfilePicture) {
-            profileImg = `<img class="profile" src="${savedProfilePicture}" alt="Profile Picture">`;
+        if (profilePicture) {
+            profileImg = `<img class="profile" src="${profilePicture}" alt="Profile Picture">`;
         }
 
+        // Apply the color for the username
         nameContainer.innerHTML = `
             ${profileImg}
-            <span class="username">${username}</span>
+            <span class="username" style="color: ${username === myname.value ? localStorage.getItem("usernameColor") : color};">
+                ${username}
+            </span>
             <span class="timestamp">(${time})</span>
         `;
 
@@ -341,6 +356,16 @@
         console.log("Username Color Saved:", selectedColor);
 
         settingsPopup.classList.add("hidden");
+    });
+
+    io.on("connection", (socket) => {
+        socket.on("send name", (data) => {
+            io.emit("send name", data); // Broadcast username, color, and profile picture to all clients
+        });
+
+        socket.on("send message", (message) => {
+            io.emit("send message", message); // Broadcast messages
+        });
     });
 </script>
 
