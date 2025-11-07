@@ -34,12 +34,21 @@
             <label for="profile-picture">Profile Picture:</label>
             <input type="file" id="profile-picture" accept="image/*" />
 
+            <button id="theme" class="button">Theme</button>
+
             <button id="save-settings" class="button">Save</button>
         </div>
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/emoji-js@3.6.0/lib/emoji.min.js"></script>
     <script src="script.js"></script>
+    <script>
+        var isDarkMode = false;
+        document.getElementById("theme").onclick = () => {
+            isDarkMode = !isDarkMode;
+            isDarkMode ? document.body.classList.add('darkmode') : document.body.classList.remove('darkmode');
+        }
+        </script>
 </body>
 
 </html>

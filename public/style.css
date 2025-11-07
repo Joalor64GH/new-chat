@@ -5,6 +5,10 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+.darkmode {
+    background-color: #0a5274;
+}
+
 .container {
     position: relative;
     max-width: 400px;
@@ -15,12 +19,20 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
+.darkmode .container {
+    background-color: black;
+}
+
 .logo {
     text-align: center;
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 20px;
     color: #0a5274;
+}
+
+.darkmode .logo {
+    color: #68cfff;
 }
 
 .form {
@@ -46,6 +58,10 @@ body {
     width: 100%;
     cursor: pointer;
     font-family: inherit;
+}
+
+.darkmode .button {
+    background-color: #68cfff;
 }
 
 .messageArea {
@@ -112,6 +128,10 @@ body {
     display: none;
 }
 
+.darkmode .popup {
+    background-color: black;
+}
+
 .popup-header {
     display: flex;
     justify-content: space-between;
@@ -144,4 +164,8 @@ body {
     border-radius: 5px;
     padding: 10px;
     cursor: pointer;
+}
+
+.darkmode #save-settings {
+    background-color: #68cfff;
 }
