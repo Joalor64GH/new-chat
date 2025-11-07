@@ -9,59 +9,11 @@ const emoji = new EmojiConvertor();
 emoji.replace_mode = 'unified';
 emoji.allow_native = true;
 
-form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    if (myname.value) {
-        localStorage.setItem("username", myname.value);
-        const myColor = localStorage.getItem("usernameColor") || "#0a5274";
-        const myProfilePicture = localStorage.getItem("profilePicture") || "";
-        socket.emit("send name", {
-            username: myname.value,
-            color: myColor,
-            profilePicture: myProfilePicture,
-        });
-    }
-
-    if (message.value) {
-        socket.emit("send message", message.value);
-        message.value = "";
-    }
-});
-
-socket.on("send name", (data) => {
-    const { username, color, profilePicture } = data;
-
-    let nameContainer = document.createElement("p");
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    nameContainer.classList.add("message");
-
-    let profileImg = "";
-    if (profilePicture) {
-        profileImg = `<img class="profile" src="${profilePicture}" alt="Profile Picture">`;
-    }
-
-    nameContainer.innerHTML = `
-            ${profileImg}
-            <span class="username" style="color: ${username === myname.value ? localStorage.getItem("usernameColor") : color};">
-                ${username}
-            </span>
-            <span class="timestamp">(${time})</span>
-        `;
-
-    messageArea.appendChild(nameContainer);
-});
-
-socket.on("send message", (chat) => {
-    let chatContent = document.createElement("p");
-    chatContent.classList.add("message");
-    chatContent.innerHTML = parseMessage(chat);
-    messageArea.appendChild(chatContent);
-
-    if (chat.includes("{!shake}")) {
-        shakeEffect(chatContent);
-    }
-});
+function sanitize(input) {
+    const div = document.createElement('div');
+    div.textContent = input;
+    return div.innerHTML;
+}
 
 function parseMessage(message) {
     const colorRegex = /\{\!color:(#[0-9A-Fa-f]{6})\}\s*(.+)/g;
@@ -110,18 +62,74 @@ function shakeEffect(element) {
     }, shakeInterval);
 }
 
+function displayMessage(data) {
+    const chatContent = document.createElement("p");
+    chatContent.classList.add("message");
+
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const profileImg = data.profilePicture ? `<img class="profile" src="${data.profilePicture}" alt="Profile Picture">` : '';
+
+    chatContent.innerHTML = `
+        ${profileImg}
+        <span class="username" style="color: ${data.color}">${sanitize(data.user)}</span>
+        <span class="timestamp">(${time})</span>: ${parseMessage(sanitize(data.text))}
+    `;
+
+    messageArea.appendChild(chatContent);
+
+    if (data.text.includes("{!shake}")) {
+        shakeEffect(chatContent);
+    }
+
+    messageArea.scrollTop = messageArea.scrollHeight;
+}
+
 const style = document.createElement('style');
 style.innerHTML = `
-        .shake {
-            display: inline-block;
-            transition: transform 0.05s;
-        }
-        .small-text {
-            font-size: 0.75em;
-            opacity: 0.6;
-        }
-    `;
+    .shake { display: inline-block; transition: transform 0.05s; }
+    .small-text { font-size: 0.75em; opacity: 0.6; }
+`;
 document.head.appendChild(style);
+
+let lastSent = 0;
+
+form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const now = Date.now();
+    if (now - lastSent < 1000) {
+        alert("You're sending messages too fast!");
+        return;
+    }
+    lastSent = now;
+
+    if (message.value.length > 200) {
+        alert("Message too long!");
+        return;
+    }
+
+    if (myname.value) {
+        localStorage.setItem("username", myname.value);
+    }
+
+    const userData = {
+        user: myname.value,
+        text: message.value,
+        color: localStorage.getItem("usernameColor") || "#0a5274",
+        profilePicture: localStorage.getItem("profilePicture") || ""
+    };
+
+    socket.emit('chat message', userData);
+    message.value = "";
+});
+
+socket.on('init messages', (msgs) => {
+    msgs.forEach(chat => displayMessage(chat));
+});
+
+socket.on("chat message", (data) => {
+    displayMessage(data);
+});
 
 const settingsIcon = document.getElementById("settings-icon");
 const settingsPopup = document.getElementById("settings-popup");
@@ -144,13 +152,8 @@ window.addEventListener("load", () => {
     }
 });
 
-settingsIcon.addEventListener("click", () => {
-    settingsPopup.classList.remove("hidden");
-});
-
-closePopup.addEventListener("click", () => {
-    settingsPopup.classList.add("hidden");
-});
+settingsIcon.addEventListener("click", () => settingsPopup.classList.remove("hidden"));
+closePopup.addEventListener("click", () => settingsPopup.classList.add("hidden"));
 
 saveSettings.addEventListener("click", () => {
     const selectedColor = usernameColor.value;
@@ -163,12 +166,9 @@ saveSettings.addEventListener("click", () => {
         const reader = new FileReader();
         reader.onload = function (event) {
             localStorage.setItem("profilePicture", event.target.result);
-            console.log("Profile Picture Saved:", event.target.result);
         };
         reader.readAsDataURL(selectedFile);
     }
-
-    console.log("Username Color Saved:", selectedColor);
 
     settingsPopup.classList.add("hidden");
 });
