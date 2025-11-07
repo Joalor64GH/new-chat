@@ -11,6 +11,7 @@ const port = 5000;
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
+app.use(express.static('public'));
 
 io.on('connection', (socket) => {
     socket.on('send name', (username) => {
