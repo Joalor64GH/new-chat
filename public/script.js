@@ -17,19 +17,13 @@ function sanitize(input) {
 
 function parseMessage(message) {
     const colorRegex = /\{\!color:(#[0-9A-Fa-f]{6})\}\s*(.+)/g;
-    message = message.replace(colorRegex, (match, color, text) => {
-        return `<span style="color: ${color};">${text}</span>`;
-    });
+    message = message.replace(colorRegex, (match, color, text) => `<span style="color: ${color};">${text}</span>`);
 
     const shakeRegex = /\{\!shake\}\s*(.+)/g;
-    message = message.replace(shakeRegex, (match, text) => {
-        return `<span class="shake">${text}</span>`;
-    });
+    message = message.replace(shakeRegex, (match, text) => `<span class="shake">${text}</span>`);
 
     const smallTextRegex = /\^(.+?)\^/g;
-    message = message.replace(smallTextRegex, (match, text) => {
-        return `<span class="small-text">${text}</span>`;
-    });
+    message = message.replace(smallTextRegex, (match, text) => `<span class="small-text">${text}</span>`);
 
     message = emoji.replace_colons(message);
 
@@ -40,7 +34,7 @@ function parseMessage(message) {
 }
 
 function shakeEffect(element) {
-    const letters = element.innerText.split('').map((letter) => {
+    const letters = element.innerText.split('').map(letter => {
         const span = document.createElement('span');
         span.innerText = letter;
         span.classList.add('shake');
@@ -77,9 +71,7 @@ function displayMessage(data) {
 
     messageArea.appendChild(chatContent);
 
-    if (data.text.includes("{!shake}")) {
-        shakeEffect(chatContent);
-    }
+    if (data.text.includes("{!shake}")) shakeEffect(chatContent);
 
     messageArea.scrollTop = messageArea.scrollHeight;
 }
@@ -90,46 +82,6 @@ style.innerHTML = `
     .small-text { font-size: 0.75em; opacity: 0.6; }
 `;
 document.head.appendChild(style);
-
-let lastSent = 0;
-
-form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const now = Date.now();
-    if (now - lastSent < 1000) {
-        alert("You're sending messages too fast!");
-        return;
-    }
-    lastSent = now;
-
-    if (message.value.length > 200) {
-        alert("Message too long!");
-        return;
-    }
-
-    if (myname.value) {
-        localStorage.setItem("username", myname.value);
-    }
-
-    const userData = {
-        user: myname.value,
-        text: message.value,
-        color: localStorage.getItem("usernameColor") || "#0a5274",
-        profilePicture: localStorage.getItem("profilePicture") || ""
-    };
-
-    socket.emit('chat message', userData);
-    message.value = "";
-});
-
-socket.on('init messages', (msgs) => {
-    msgs.forEach(chat => displayMessage(chat));
-});
-
-socket.on("chat message", (data) => {
-    displayMessage(data);
-});
 
 const settingsIcon = document.getElementById("settings-icon");
 const settingsPopup = document.getElementById("settings-popup");
@@ -146,15 +98,10 @@ window.addEventListener("load", () => {
         usernameColor.value = savedColor;
         document.documentElement.style.setProperty("--username-color", savedColor);
     }
-
-    if (savedProfilePicture) {
-        console.log("Profile Picture Loaded:", savedProfilePicture);
-    }
 });
 
 settingsIcon.addEventListener("click", () => settingsPopup.classList.remove("hidden"));
 closePopup.addEventListener("click", () => settingsPopup.classList.add("hidden"));
-
 saveSettings.addEventListener("click", () => {
     const selectedColor = usernameColor.value;
     const selectedFile = profilePicture.files[0];
@@ -164,11 +111,39 @@ saveSettings.addEventListener("click", () => {
 
     if (selectedFile) {
         const reader = new FileReader();
-        reader.onload = function (event) {
-            localStorage.setItem("profilePicture", event.target.result);
-        };
+        reader.onload = e => localStorage.setItem("profilePicture", e.target.result);
         reader.readAsDataURL(selectedFile);
     }
 
     settingsPopup.classList.add("hidden");
 });
+
+let lastSent = 0;
+
+form.addEventListener("submit", e => {
+    e.preventDefault();
+
+    const now = Date.now();
+    if (now - lastSent < 1000) {
+        alert("You're sending messages too fast!");
+        return;
+    }
+    lastSent = now;
+
+    if (!myname.value) return alert("Enter your name!");
+    if (!message.value) return;
+    if (message.value.length > 200) return alert("Message too long!");
+
+    const msgData = {
+        user: myname.value,
+        text: message.value,
+        color: localStorage.getItem("usernameColor") || "#0a5274",
+        profilePicture: localStorage.getItem("profilePicture") || ""
+    };
+
+    socket.emit('chat message', msgData);
+    message.value = "";
+});
+
+socket.on('init messages', msgs => msgs.forEach(displayMessage));
+socket.on('chat message', displayMessage);

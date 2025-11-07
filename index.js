@@ -11,16 +11,14 @@ app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'));
 
 const messages = [];
 
-io.on('connection', (socket) => {
+io.on('connection', socket => {
     socket.emit('init messages', messages);
 
-    socket.on('chat message', (msg) => {
-        messages.push(msg);
+    socket.on('chat message', data => {
+        messages.push(data);
         if (messages.length > 50) messages.shift();
-        io.emit('chat message', msg);
+        io.emit('chat message', data);
     });
 });
 
-server.listen(port, () => {
-    console.log(`Server is listening at port ${port}`);
-});
+server.listen(port, () => console.log(`Server running on port ${port}`));
