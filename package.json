@@ -1,5 +1,5 @@
 {
-  "name": "new-chat",
+  "name": "joalor64-chat",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -7,8 +7,8 @@
     "start": "node index.js"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Joalor64",
+  "license": "Apache-2.0",
   "description": "",
   "dependencies": {
     "express": "^4.21.2",
