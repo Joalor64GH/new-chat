@@ -7,6 +7,7 @@ body {
 
 .darkmode {
     background-color: #0a5274;
+    color: white;
 }
 
 .container {
@@ -62,6 +63,7 @@ body {
 
 .darkmode .button {
     background-color: #68cfff;
+    color: black;
 }
 
 .messageArea {
@@ -80,6 +82,10 @@ body {
 .username {
     font-weight: bold;
     color: var(--username-color, #0a5274);
+}
+
+.darkmode .username {
+    color: var(--username-color, #68cfff);
 }
 
 .profile {
