@@ -8,10 +8,11 @@ const server = http.createServer(app);
 const io = new Server(server);
 const port = 5000;
 
+app.use(express.static('public'));
+
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
-app.use(express.static('public'));
 
 io.on('connection', (socket) => {
     socket.on('send name', (username) => {
